@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预警管理 - 作者管理应用系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2c5282 100%);
+            color: white;
+            padding: 0 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 5px;
+        }
+        .nav-menu a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .nav-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .nav-menu a.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+        }
+        .user-info:hover .user-dropdown {
+            display: block;
+        }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+        }
+        .user-dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        .user-dropdown-item:hover {
+            background: #f5f7fa;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .filter-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+        }
+        .filter-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: #1e3a8a;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-item label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .filter-item input,
+        .filter-item select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .filter-item input:focus,
+        .filter-item select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2c5282;
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .btn-outline {
+            background: white;
+            border: 1px solid #1e3a8a;
+            color: #1e3a8a;
+        }
+        .btn-outline:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+        .stats-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .stat-item .label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .stat-item .value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .stat-item.danger .value {
+            color: #f44336;
+        }
+        .stat-item.warning .value {
+            color: #ff9800;
+        }
+        .tabs {
+            background: white;
+            border-radius: 8px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .tabs-nav {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover {
+            color: #1e3a8a;
+        }
+        .tab-btn.active {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #1e3a8a;
+        }
+        .tab-btn .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tab-content {
+            padding: 20px 0;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .sub-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .sub-tab-btn {
+            padding: 6px 16px;
+            background: #f5f7fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .sub-tab-btn:hover {
+            background: #e9ecef;
+        }
+        .sub-tab-btn.active {
+            background: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+        .status-badge.ignored {
+            background: #999;
+            color: white;
+        }
+        .table-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e9ecef;
+            white-space: nowrap;
+        }
+        th.sortable {
+            cursor: pointer;
+        }
+        th.sortable:hover {
+            background: #e9ecef;
+        }
+        th.sortable::after {
+            content: '↕';
+            margin-left: 5px;
+            opacity: 0.3;
+        }
+        th.sortable.asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+        th.sortable.desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .risk-badge.high {
+            background: #f44336;
+            color: white;
+        }
+        .risk-badge.medium {
+            background: #ff9800;
+            color: white;
+        }
+        .risk-badge.low {
+            background: #4caf50;
+            color: white;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-badge.pending {
+            background: #ff9800;
+            color: white;
+        }
+        .status-badge.processed {
+            background: #4caf50;
+            color: white;
+        }
+        .status-badge.unconfirmed {
+            background: #f44336;
+            color: white;
+        }
+        .status-badge.confirmed {
+            background: #4caf50;
+            color: white;
+        }
+        .channel-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .channel-badge.system {
+            background: #2196f3;
+            color: white;
+        }
+        .channel-badge.sms {
+            background: #9c27b0;
+            color: white;
+        }
+        .channel-badge.wechat {
+            background: #4caf50;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .pagination button {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .pagination button:hover:not(:disabled) {
+            border-color: #1e3a8a;
+            color: #1e3a8a;
+        }
+        .pagination button.active {
+            background: #1e3a8a;
+            color: white;
+            border-color: #1e3a8a;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination-info {
+            font-size: 14px;
+            color: #666;
+        }
+        .checkbox-column {
+            width: 40px;
+            text-align: center;
+        }
+        .checkbox-column input {
+            cursor: pointer;
+        }
+        .alert-row {
+            background: #ffebee;
+        }
+        .alert-row td {
+            border-left: 4px solid #f44336;
+        }
+        .btn-link {
+            background: none;
+            border: none;
+            color: #1e3a8a;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+        }
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+        .unread {
+            font-weight: 600;
+            color: #333;
+        }
+        .read {
+            color: #999;
+        }
+        .time-ago {
+            font-size: 12px;
+            color: #999;
+        }
+        .highlight-text {
+            color: #f44336;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="../logo蓝红白黑/logo蓝红白黑/logo3.png" alt="Logo" class="header-logo">
+            <nav class="nav-menu">
+                <a href="cockpit.html">智能决策驾驶舱</a>
+                <a href="teacher-list.html">作者检索</a>
+                <a href="university-list.html">高校检索</a>
+                <a href="warning-management.html" class="active">预警管理</a>
+                <a href="sentiment-list.html">舆情信息</a>
+                <a href="my.html">我的</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="user-info" onclick="toggleUserMenu()">
+                <div class="user-avatar">王</div>
+                <span>王编辑</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showUserInfo()">个人信息</div>
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showPermissions()">菜单权限</div>
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showTabPermissions()">Tab页权限</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">退出</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filter-section">
+            <div class="filter-title">筛选区</div>
+            
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>关键词检索</label>
+                    <input type="text" placeholder="请输入关键词检索预警信息">
+                </div>
+                <div class="filter-item">
+                    <label>预警类型</label>
+                    <select>
+                        <option value="">全部类型</option>
+                        <option value="1">高风险-违法违纪（中纪委）</option>
+                        <option value="2">中风险-科研不端</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>触发时间</label>
+                    <input type="date">
+                </div>
+                <div class="filter-item">
+                    <label>处理状态</label>
+                    <select>
+                        <option value="">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="processed">已处理</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>关联高校</label>
+                    <input type="text" placeholder="请输入高校名称">
+                </div>
+                <div class="filter-item">
+                    <label>关联教师</label>
+                    <input type="text" placeholder="请输入教师姓名">
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="btn btn-secondary" onclick="resetSearch()">重置</button>
+                <button class="btn btn-primary" onclick="searchWarnings()">搜索</button>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item danger">
+                    <div class="label">高风险预警</div>
+                    <div class="value">23</div>
+                </div>
+                <div class="stat-item warning">
+                    <div class="label">中风险预警</div>
+                    <div class="value">45</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">已处置</div>
+                    <div class="value">45</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">未处置</div>
+                    <div class="value">56</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">不处置</div>
+                    <div class="value">12</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchMainTab('monitor')">
+                    预警监控
+                    <span class="badge">68</span>
+                </button>
+                <button class="tab-btn" onclick="switchMainTab('my')">
+                    我的监控
+                    <span class="badge">15</span>
+                </button>
+            </div>
+
+            <div class="tab-content active" id="tab-monitor">
+                <div class="table-section">
+                    <div class="table-header">
+                        <div class="table-title">预警信息列表</div>
+                        <div class="table-actions">
+                            <select id="monitorStatusFilter" style="padding: 5px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">全部处置状态</option>
+                                <option value="processed">已处置</option>
+                                <option value="unprocessed">未处置</option>
+                                <option value="ignored">不处置</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="filterMonitorTable()">筛选</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-column"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                                    <th>预警类型</th>
+                                    <th>触发时间</th>
+                                    <th>关联对象</th>
+                                    <th>推送内容</th>
+                                    <th>处置状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="alert-row" data-status="unprocessed">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge high">高风险</span>-违法违纪（中纪委）</td>
+                                    <td>2024-02-20 10:30</td>
+                                    <td>张三（北京大学）</td>
+                                    <td>涉嫌严重违纪违法，目前正接受纪律审查和监察调查</td>
+                                    <td><span class="status-badge pending">未处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W001', 'high', '张三')">查看详情</button>
+                                            <button class="btn-link" onclick="handleWarning('W001', '张三（北京大学）', '高风险-违法违纪（中纪委）')">处置</button>
+                                            <button class="btn-link" onclick="ignoreWarning('W001')">不处置</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="unprocessed">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge medium">中风险</span>-科研不端</td>
+                                    <td>2024-02-19 15:45</td>
+                                    <td>李四（清华大学）</td>
+                                    <td>违反廉洁纪律，受到党内警告处分</td>
+                                    <td><span class="status-badge pending">未处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W002', 'medium', '李四')">查看详情</button>
+                                            <button class="btn-link" onclick="handleWarning('W002', '李四（清华大学）', '中风险-科研不端')">处置</button>
+                                            <button class="btn-link" onclick="ignoreWarning('W002')">不处置</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="processed">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge medium">中风险</span>-科研不端</td>
+                                    <td>2024-02-18 09:20</td>
+                                    <td>王五（复旦大学）</td>
+                                    <td>科研不端行为：论文数据存在造假嫌疑</td>
+                                    <td><span class="status-badge processed">已处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W003', 'medium', '王五')">查看详情</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="ignored">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge medium">中风险</span>-科研不端</td>
+                                    <td>2024-02-17 14:10</td>
+                                    <td>浙江大学</td>
+                                    <td>高校负面舆情：学术不端事件引发社会关注</td>
+                                    <td><span class="status-badge ignored">不处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W004', 'university', '浙江大学')">查看详情</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <button onclick="goToPage(1)">首页</button>
+                        <button disabled>上一页</button>
+                        <button class="active" onclick="goToPage(1)">1</button>
+                        <button onclick="goToPage(2)">2</button>
+                        <button onclick="goToPage(3)">3</button>
+                        <button>...</button>
+                        <button onclick="goToPage(14)">14</button>
+                        <button onclick="goToPage(2)">下一页</button>
+                        <button onclick="goToPage(14)">尾页</button>
+                        <span class="pagination-info">共 135 条记录，每页 10 条</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-my">
+                <div class="table-section">
+                    <div class="table-header">
+                        <div class="table-title">我关注的预警信息</div>
+                        <div class="table-actions">
+                            <select id="myStatusFilter" style="padding: 5px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                <option value="">全部处置状态</option>
+                                <option value="processed">已处置</option>
+                                <option value="unprocessed">未处置</option>
+                                <option value="ignored">不处置</option>
+                            </select>
+                            <button class="btn btn-primary btn-sm" onclick="filterMyTable()">筛选</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-column"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                                    <th>预警类型</th>
+                                    <th>触发时间</th>
+                                    <th>关联对象</th>
+                                    <th>推送内容</th>
+                                    <th>处置状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="alert-row" data-status="unprocessed">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge high">高风险</span>-违法违纪（中纪委）</td>
+                                    <td>2024-02-20 10:30</td>
+                                    <td>张三（北京大学）</td>
+                                    <td>涉嫌严重违纪违法，目前正接受纪律审查和监察调查</td>
+                                    <td><span class="status-badge pending">未处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W001', 'high', '张三')">查看详情</button>
+                                            <button class="btn-link" onclick="handleWarning('W001', '张三（北京大学）', '高风险-违法违纪（中纪委）')">处置</button>
+                                            <button class="btn-link" onclick="ignoreWarning('W001')">不处置</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr data-status="processed">
+                                    <td class="checkbox-column"><input type="checkbox"></td>
+                                    <td><span class="risk-badge medium">中风险</span>-科研不端</td>
+                                    <td>2024-02-18 09:20</td>
+                                    <td>王五（复旦大学）</td>
+                                    <td>科研不端行为：论文数据存在造假嫌疑</td>
+                                    <td><span class="status-badge processed">已处置</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-link" onclick="viewWarningDetail('W003', 'medium', '王五')">查看详情</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <button onclick="goToPage(1)">首页</button>
+                        <button disabled>上一页</button>
+                        <button class="active" onclick="goToPage(1)">1</button>
+                        <button onclick="goToPage(2)">2</button>
+                        <button>...</button>
+                        <button onclick="goToPage(2)">下一页</button>
+                        <button onclick="goToPage(2)">尾页</button>
+                        <span class="pagination-info">共 15 条记录，每页 10 条</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            if (confirm('确定要退出系统吗？')) {
+                alert('已退出系统');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showUserInfo() {
+            alert('个人信息\n\n账号：wang_editor\n姓名：王编辑\n部门：理工事业部\n邮箱：wang@hep.com.cn\n电话：010-12345678');
+        }
+
+        function showPermissions() {
+            alert('菜单权限\n\n✓ 作者列表\n✓ 作者画像\n✓ 高校列表\n✓ 高校画像\n✓ 预警管理\n✓ 账号设置\n\n当前账号拥有所有菜单访问权限');
+        }
+
+        function showTabPermissions() {
+            alert('Tab页权限\n\n作者列表：全部Tab页\n作者画像：全部Tab页\n高校列表：全部Tab页\n高校画像：全部Tab页\n预警管理：全部Tab页\n\n当前账号拥有所有Tab页查看权限');
+        }
+
+        document.addEventListener('click', function(event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userInfo.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function switchMainTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function toggleAllCheckboxes(checkbox) {
+            const activeContent = document.querySelector('.tab-content.active');
+            const checkboxes = activeContent.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function searchWarnings() {
+            alert('正在搜索预警信息...');
+        }
+
+        function resetSearch() {
+            alert('已重置搜索条件');
+        }
+
+        function filterMonitorTable() {
+            const statusFilter = document.getElementById('monitorStatusFilter').value;
+            const table = document.querySelector('#tab-monitor table tbody');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const statusCell = row.querySelector('td:nth-child(6)');
+                
+                if (statusCell) {
+                    const statusText = statusCell.textContent.trim();
+                    let showRow = true;
+                    
+                    if (statusFilter === 'processed' && !statusText.includes('已处置')) {
+                        showRow = false;
+                    }
+                    if (statusFilter === 'unprocessed' && !statusText.includes('未处置')) {
+                        showRow = false;
+                    }
+                    if (statusFilter === 'ignored' && !statusText.includes('不处置')) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                }
+            });
+        }
+
+        function filterMyTable() {
+            const statusFilter = document.getElementById('myStatusFilter').value;
+            const table = document.querySelector('#tab-my table tbody');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const statusCell = row.querySelector('td:nth-child(6)');
+                
+                if (statusCell) {
+                    const statusText = statusCell.textContent.trim();
+                    let showRow = true;
+                    
+                    if (statusFilter === 'processed' && !statusText.includes('已处置')) {
+                        showRow = false;
+                    }
+                    if (statusFilter === 'unprocessed' && !statusText.includes('未处置')) {
+                        showRow = false;
+                    }
+                    if (statusFilter === 'ignored' && !statusText.includes('不处置')) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                }
+            });
+        }
+
+        function viewWarningDetail(id, type, name) {
+            const warningUrls = {
+                'high': 'https://www.ccdi.gov.cn/',
+                'medium': 'https://www.nsfc.gov.cn/'
+            };
+            
+            const url = warningUrls[type] || 'https://www.ccdi.gov.cn/';
+            
+            if (confirm('即将跳转至外网数据来源查看预警详情\n\n预警ID：' + id + '\n预警对象：' + name + '\n\n是否继续？')) {
+                window.open(url, '_blank');
+            }
+        }
+
+        function handleWarning(id, name, type) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 8px; padding: 30px; width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; font-size: 18px; color: #1e3a8a;">预警处置</h3>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                        <h4 style="margin: 0 0 15px 0; font-size: 14px; color: #666; border-bottom: 1px solid #e9ecef; padding-bottom: 10px;">预警基本信息</h4>
+                        <div style="font-size: 14px; color: #333;">
+                            <div style="margin-bottom: 8px;"><strong>预警ID：</strong>${id}</div>
+                            <div style="margin-bottom: 8px;"><strong>预警对象：</strong>${name}</div>
+                            <div style="margin-bottom: 8px;"><strong>预警类型：</strong>${type}</div>
+                            <div style="margin-bottom: 8px;"><strong>触发时间：</strong>2024-02-20 10:30</div>
+                            <div><strong>推送内容：</strong>涉嫌严重违纪违法，目前正接受纪律审查和监察调查</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #333;">处置情况说明</label>
+                            <textarea id="handleDescription" rows="6" placeholder="请输入处置情况说明" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="background: #f5f7fa; color: #666; border: 1px solid #ddd; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">取消</button>
+                        <button onclick="submitHandle('${id}', '${name}', '${type}')" style="background: #1e3a8a; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px;">提交</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function submitHandle(id, name, type) {
+            const handleDescription = document.getElementById('handleDescription').value;
+            
+            alert('预警处置信息已提交\n\n预警ID：' + id + '\n预警对象：' + name + '\n预警类型：' + type + '\n处置情况说明：' + (handleDescription || '无'));
+            
+            document.querySelector('div[style*=fixed]').remove();
+        }
+
+        function ignoreWarning(id) {
+            if (confirm('确定标记为"不处置"吗？')) {
+                alert('已标记为不处置');
+            }
+        }
+
+        function goToPage(pageNum) {
+            alert('跳转到第' + pageNum + '页');
+        }
+    </script>
+</body>
+</html>

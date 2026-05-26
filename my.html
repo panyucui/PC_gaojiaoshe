@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的 - 作者管理应用系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2c5282 100%);
+            color: white;
+            padding: 0 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-menu a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-menu a:hover {
+            color: white;
+        }
+        .nav-menu a.active {
+            color: white;
+            border-bottom-color: white;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .user-info:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 80px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 150px;
+            z-index: 1000;
+        }
+        .user-dropdown.show {
+            display: block;
+        }
+        .user-dropdown-item {
+            padding: 12px 16px;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .user-dropdown-item:hover {
+            background: #f5f7fa;
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2c5282;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #1e3a8a;
+            color: #1e3a8a;
+        }
+        .btn-outline:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-btn:hover {
+            color: #1e3a8a;
+            background: rgba(30, 58, 138, 0.05);
+        }
+        .tab-btn.active {
+            color: #1e3a8a;
+            background: white;
+            border-bottom: 3px solid #1e3a8a;
+            font-weight: 500;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+        td {
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .checkbox-column {
+            width: 40px;
+            text-align: center;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            width: 120px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        .permission-section {
+            margin-bottom: 24px;
+        }
+        .permission-section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .permission-item:hover {
+            background: #e9ecef;
+        }
+        .menu-permission-item {
+            background: transparent;
+            color: #495057;
+            font-weight: 500;
+            border: none;
+        }
+        .menu-permission-item:hover {
+            background: #f8f9fa;
+        }
+        .menu-permission-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .menu-permission-item label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+            font-weight: 500;
+        }
+        .tab-permission-group {
+            margin-bottom: 20px;
+        }
+        .tab-permission-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+        }
+        .access-log-item {
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+        }
+        .access-log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .access-log-time {
+            color: #6c757d;
+            font-size: 13px;
+        }
+        .access-log-action {
+            color: #1e3a8a;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .access-log-detail {
+            color: #495057;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="../logo蓝红白黑/logo蓝红白黑/logo3.png" alt="Logo" class="header-logo">
+            <nav class="nav-menu">
+                <a href="cockpit.html">智能决策驾驶舱</a>
+                <a href="teacher-list.html">作者检索</a>
+                <a href="university-list.html">高校检索</a>
+                <a href="warning-management.html">预警管理</a>
+                <a href="sentiment-list.html">舆情信息</a>
+                <a href="my.html" class="active">我的</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="user-info" onclick="toggleUserMenu()">
+                <div class="user-avatar">王</div>
+                <span>王编辑</span>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showUserInfo()">个人信息</div>
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showPermissions()">菜单权限</div>
+                    <div class="user-dropdown-item" onclick="event.stopPropagation(); showTabPermissions()">Tab页权限</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">退出</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h2 class="page-title">我的</h2>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('teachers')">关注的作者</button>
+            <button class="tab-btn" onclick="switchTab('access')">访问记录</button>
+            <button class="tab-btn" onclick="switchTab('contact')">联系方式查看记录</button>
+            <button class="tab-btn" onclick="switchTab('correction')">纠错管理</button>
+            <button class="tab-btn" onclick="switchTab('rolePermissions')">角色权限配置</button>
+            <button class="tab-btn" onclick="switchTab('roleMembers')">角色人员配置</button>
+        </div>
+
+        <div id="tab-teachers" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">关注的作者列表</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: #6c757d; font-size: 14px;">共 5 位</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #495057; font-size: 14px;">关注时间：</label>
+                            <input type="date" id="teacherStartDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <span style="color: #6c757d;">至</span>
+                            <input type="date" id="teacherEndDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <button class="btn btn-sm btn-primary" onclick="filterTeachers()">筛选</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="checkbox-column"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                                <th>姓名</th>
+                                <th>所属单位</th>
+                                <th>职称等级</th>
+                                <th>职称称谓</th>
+                                <th>合作状态</th>
+                                <th>关注时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="checkbox-column"><input type="checkbox"></td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">张三</a></td>
+                                <td>北京大学</td>
+                                <td>正高级</td>
+                                <td>教授</td>
+                                <td><span style="color: #28a745;">已合作</span></td>
+                                <td>2024-01-15</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline btn-sm" onclick="window.location.href='teacher-profile.html'">查看画像</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="unfollowTeacher('张三')">取消关注</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-column"><input type="checkbox"></td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">李四</a></td>
+                                <td>清华大学</td>
+                                <td>正高级</td>
+                                <td>教授</td>
+                                <td><span style="color: #28a745;">已合作</span></td>
+                                <td>2024-02-20</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline btn-sm" onclick="window.location.href='teacher-profile.html'">查看画像</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="unfollowTeacher('李四')">取消关注</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-column"><input type="checkbox"></td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">王五</a></td>
+                                <td>复旦大学</td>
+                                <td>副高级</td>
+                                <td>副教授</td>
+                                <td><span style="color: #dc3545;">未合作</span></td>
+                                <td>2024-03-10</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline btn-sm" onclick="window.location.href='teacher-profile.html'">查看画像</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="unfollowTeacher('王五')">取消关注</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-column"><input type="checkbox"></td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">赵六</a></td>
+                                <td>浙江大学</td>
+                                <td>正高级</td>
+                                <td>教授</td>
+                                <td><span style="color: #28a745;">已合作</span></td>
+                                <td>2024-03-25</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline btn-sm" onclick="window.location.href='teacher-profile.html'">查看画像</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="unfollowTeacher('赵六')">取消关注</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="checkbox-column"><input type="checkbox"></td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">钱七</a></td>
+                                <td>上海交通大学</td>
+                                <td>中级</td>
+                                <td>讲师</td>
+                                <td><span style="color: #dc3545;">未合作</span></td>
+                                <td>2024-04-05</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-outline btn-sm" onclick="window.location.href='teacher-profile.html'">查看画像</button>
+                                        <button class="btn btn-secondary btn-sm" onclick="unfollowTeacher('钱七')">取消关注</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-access" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">用户访问记录</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: #6c757d; font-size: 14px;">最近 30 天</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #495057; font-size: 14px;">访问时间：</label>
+                            <input type="date" id="accessStartDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <span style="color: #6c757d;">至</span>
+                            <input type="date" id="accessEndDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <button class="btn btn-sm btn-primary" onclick="filterAccessLogs()">筛选</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">查看作者画像</span>
+                        <span class="access-log-time">2024-03-12 14:30</span>
+                    </div>
+                    <div class="access-log-detail">查看了张三（北京大学）的作者画像</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">查看高校画像</span>
+                        <span class="access-log-time">2024-03-12 11:20</span>
+                    </div>
+                    <div class="access-log-detail">查看了北京大学的画像信息</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">关注作者</span>
+                        <span class="access-log-time">2024-03-11 16:45</span>
+                    </div>
+                    <div class="access-log-detail">关注了作者：钱七（上海交通大学）</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">查看预警信息</span>
+                        <span class="access-log-time">2024-03-11 09:15</span>
+                    </div>
+                    <div class="access-log-detail">查看了预警监控中的预警信息</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">查看作者列表</span>
+                        <span class="access-log-time">2024-03-10 15:30</span>
+                    </div>
+                    <div class="access-log-detail">浏览了作者检索列表</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">关注高校</span>
+                        <span class="access-log-time">2024-03-10 10:20</span>
+                    </div>
+                    <div class="access-log-detail">关注了高校：复旦大学</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">查看作者画像</span>
+                        <span class="access-log-time">2024-03-09 14:50</span>
+                    </div>
+                    <div class="access-log-detail">查看了李四（清华大学）的作者画像</div>
+                </div>
+                <div class="access-log-item">
+                    <div class="access-log-header">
+                        <span class="access-log-action">登录系统</span>
+                        <span class="access-log-time">2024-03-09 08:30</span>
+                    </div>
+                    <div class="access-log-detail">通过OA单点登录系统</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-contact" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">联系方式查看记录</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: #6c757d; font-size: 14px;">最近 30 天</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #495057; font-size: 14px;">查看时间：</label>
+                            <input type="date" id="contactStartDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <span style="color: #6c757d;">至</span>
+                            <input type="date" id="contactEndDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <button class="btn btn-sm btn-primary" onclick="filterContactLogs()">筛选</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>查看时间</th>
+                                <th>作者姓名</th>
+                                <th>所属单位</th>
+                                <th>查看内容</th>
+                                <th>查看人</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-03-12 16:45</td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">张三</a></td>
+                                <td>北京大学</td>
+                                <td>联系方式、工作邮箱</td>
+                                <td>王编辑</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-12 14:30</td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">李四</a></td>
+                                <td>清华大学</td>
+                                <td>联系方式</td>
+                                <td>王编辑</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-11 09:15</td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">王五</a></td>
+                                <td>复旦大学</td>
+                                <td>工作邮箱</td>
+                                <td>王编辑</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-10 11:20</td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">赵六</a></td>
+                                <td>浙江大学</td>
+                                <td>联系方式</td>
+                                <td>王编辑</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-09 15:30</td>
+                                <td><a href="teacher-profile.html" style="color: #1e3a8a; text-decoration: none;">钱七</a></td>
+                                <td>上海交通大学</td>
+                                <td>联系方式、工作邮箱</td>
+                                <td>王编辑</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-correction" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" id="correctionTitle">纠错管理</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="color: #6c757d; font-size: 14px;" id="correctionCount">共 2 条</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="color: #495057; font-size: 14px;">账号：</label>
+                            <select id="demoAccountSelect" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;" onchange="switchDemoAccount()">
+                                <option value="王编辑">王编辑（普通账号）</option>
+                                <option value="李编辑">李编辑（普通账号）</option>
+                                <option value="张编辑">张编辑（普通账号）</option>
+                                <option value="管理员">管理员（全权限）</option>
+                                <option value="刘意">刘意（全权限）</option>
+                            </select>
+                            <label style="color: #495057; font-size: 14px; margin-left: 10px;">状态筛选：</label>
+                            <select id="correctionStatusFilter" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;" onchange="filterCorrectionTable()">
+                                <option value="all">全部</option>
+                                <option value="resolved">已解决</option>
+                                <option value="unresolved">未解决</option>
+                                <option value="notresolved">不解决</option>
+                            </select>
+                            <label style="color: #495057; font-size: 14px; margin-left: 10px;">纠错时间：</label>
+                            <input type="date" id="correctionStartDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <span style="color: #6c757d;">至</span>
+                            <input type="date" id="correctionEndDate" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px;">
+                            <button class="btn btn-sm btn-primary" onclick="filterCorrectionByDate()">筛选</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="correctionTable">
+                        <thead>
+                            <tr>
+                                <th>纠错类型</th>
+                                <th>纠错说明</th>
+                                <th>纠错人</th>
+                                <th>纠错时间</th>
+                                <th>是否解决</th>
+                                <th id="actionColumnHeader">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="correctionTableBody">
+                            <tr data-status="resolved" data-submitter="王编辑" data-date="2024-02-15">
+                                <td>数据错误</td>
+                                <td>出生年月与实际不符</td>
+                                <td>王编辑</td>
+                                <td>2024-02-15 10:30</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #52c41a; color: white;">已解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved" selected>已解决</option>
+                                        <option value="unresolved">未解决</option>
+                                        <option value="notresolved">不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                            <tr data-status="unresolved" data-submitter="王编辑" data-date="2024-02-10">
+                                <td>字段缺失</td>
+                                <td>缺少联系电话信息</td>
+                                <td>王编辑</td>
+                                <td>2024-02-10 14:20</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #ff9800; color: white;">未解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved">已解决</option>
+                                        <option value="unresolved" selected>未解决</option>
+                                        <option value="notresolved">不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                            <tr data-status="notresolved" data-submitter="李编辑" data-date="2024-02-08">
+                                <td>数据源冲突</td>
+                                <td>两个数据源中的职称信息不一致</td>
+                                <td>李编辑</td>
+                                <td>2024-02-08 09:15</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #dc3545; color: white;">不解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved">已解决</option>
+                                        <option value="unresolved">未解决</option>
+                                        <option value="notresolved" selected>不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                            <tr data-status="unresolved" data-submitter="张编辑" data-date="2024-03-01">
+                                <td>格式错误</td>
+                                <td>邮箱格式不正确</td>
+                                <td>张编辑</td>
+                                <td>2024-03-01 11:45</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #ff9800; color: white;">未解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved">已解决</option>
+                                        <option value="unresolved" selected>未解决</option>
+                                        <option value="notresolved">不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                            <tr data-status="unresolved" data-submitter="管理员" data-date="2024-03-15">
+                                <td>数据错误</td>
+                                <td>单位名称拼写错误</td>
+                                <td>管理员</td>
+                                <td>2024-03-15 16:20</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #ff9800; color: white;">未解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved">已解决</option>
+                                        <option value="unresolved" selected>未解决</option>
+                                        <option value="notresolved">不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                            <tr data-status="resolved" data-submitter="刘意" data-date="2024-03-20">
+                                <td>字段缺失</td>
+                                <td>缺少学术头衔信息</td>
+                                <td>刘意</td>
+                                <td>2024-03-20 09:30</td>
+                                <td class="status-cell">
+                                    <span class="status-display" style="display: none;"><span class="risk-badge" style="background: #52c41a; color: white;">已解决</span></span>
+                                    <select class="status-select" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                        <option value="resolved" selected>已解决</option>
+                                        <option value="unresolved">未解决</option>
+                                        <option value="notresolved">不解决</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn btn-outline btn-sm save-btn" onclick="saveCorrectionStatus(this)">保存</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #6c757d;" id="correctionPermissionHint">
+                    <strong>权限说明：</strong>当前账号只能查看自己提交的纠错记录。
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-rolePermissions" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">角色权限配置</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label style="color: #495057; font-size: 14px;">选择角色：</label>
+                        <select id="roleSelect" style="padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; min-width: 200px;" onchange="loadRolePermissions()">
+                            <option value="admin">管理员</option>
+                            <option value="editor">编辑</option>
+                            <option value="user">普通用户</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="permission-section">
+                    <h4 class="permission-section-title">菜单权限</h4>
+                    <div class="permission-grid">
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermCockpit" checked>
+                            <label for="rolePermCockpit">智能决策驾驶舱</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermTeacherList" checked onchange="syncTabPermissions('teacherList')">
+                            <label for="rolePermTeacherList">作者检索</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermUniversityList" checked onchange="syncTabPermissions('universityList')">
+                            <label for="rolePermUniversityList">高校检索</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermWarning" checked onchange="syncTabPermissions('warning')">
+                            <label for="rolePermWarning">预警管理</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermMy" checked>
+                            <label for="rolePermMy">我的</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-section">
+                    <h4 class="permission-section-title">Tab页权限</h4>
+
+                    <div class="tab-permission-group">
+                        <h5 class="tab-permission-group-title">作者检索</h5>
+                        <div class="permission-grid">
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListBasic" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListBasic">基础信息</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListAcademic" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListAcademic">学术能力</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListCooperation" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListCooperation">社内合作</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListIndustry" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListIndustry">行业出书</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListSample" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListSample">样书领用</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListRisk" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListRisk">风险预警</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListSentiment" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListSentiment">舆情信息</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabTeacherListMark" checked class="role-tab-perm-teacher-list">
+                                <label for="roleTabTeacherListMark">数据纠错</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-permission-group">
+                        <h5 class="tab-permission-group-title">高校检索</h5>
+                        <div class="permission-grid">
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabUniversityListBasic" checked class="role-tab-perm-university-list">
+                                <label for="roleTabUniversityListBasic">基础信息</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabUniversityListTeachers" checked class="role-tab-perm-university-list">
+                                <label for="roleTabUniversityListTeachers">收录教师</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabUniversityListCooperation" checked class="role-tab-perm-university-list">
+                                <label for="roleTabUniversityListCooperation">合作情况</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-permission-group">
+                        <h5 class="tab-permission-group-title">预警管理</h5>
+                        <div class="permission-grid">
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabWarningMonitor" checked class="role-tab-perm-warning">
+                                <label for="roleTabWarningMonitor">预警监控</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="roleTabWarningMy" checked class="role-tab-perm-warning">
+                                <label for="roleTabWarningMy">我的监控</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-section">
+                    <h4 class="permission-section-title">纠错管理权限</h4>
+                    <div class="permission-grid">
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermCorrectionManage">
+                            <label for="rolePermCorrectionManage">纠错管理（查看全部纠错信息并修改解决状态）</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="permission-section">
+                    <h4 class="permission-section-title">导出权限</h4>
+                    <div class="permission-grid">
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermExportTeacher">
+                            <label for="rolePermExportTeacher">作者检索</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermExportUniversity">
+                            <label for="rolePermExportUniversity">高校检索</label>
+                        </div>
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="rolePermExportRisk">
+                            <label for="rolePermExportRisk">风险预警</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-primary" onclick="saveRolePermissions()" style="padding: 10px 30px; font-size: 15px;">保存角色权限配置</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-roleMembers" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">角色人员配置</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label style="color: #495057; font-size: 14px;">选择角色：</label>
+                        <select id="roleMemberSelect" style="padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; min-width: 200px;" onchange="loadRoleMembers()">
+                            <option value="admin">管理员</option>
+                            <option value="editor">编辑</option>
+                            <option value="user">普通用户</option>
+                        </select>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-left: 20px;">
+                            <label style="color: #495057; font-size: 14px;">添加人员：</label>
+                            <input type="text" id="newMemberInput" placeholder="输入账号或姓名" style="padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; width: 150px;">
+                            <button class="btn btn-sm btn-primary" onclick="addRoleMember()">添加</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>账号</th>
+                                <th>姓名</th>
+                                <th>部门</th>
+                                <th>添加时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roleMembersTableBody">
+                            <tr>
+                                <td>admin</td>
+                                <td>管理员</td>
+                                <td>系统管理部</td>
+                                <td>2024-01-01</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm" onclick="removeRoleMember('admin')">移除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>liuyi</td>
+                                <td>刘意</td>
+                                <td>编辑部</td>
+                                <td>2024-01-01</td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm" onclick="removeRoleMember('liuyi')">移除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #6c757d;">
+                    <strong>说明：</strong>角色人员配置完成后，该角色下的所有人员将自动继承角色对应的权限设置。
+                </div>
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-primary" onclick="saveRoleMembers()" style="padding: 10px 30px; font-size: 15px;">保存角色人员配置</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h3 class="card-title">账户例外权限配置</h3>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <label style="color: #495057; font-size: 14px;">选择账户：</label>
+                    <select id="exceptionAccountSelect" style="padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; min-width: 200px;" onchange="loadAccountExceptionPermissions()">
+                        <option value="wang_editor">王编辑（wang_editor）</option>
+                        <option value="li_editor">李编辑（li_editor）</option>
+                        <option value="zhang_editor">张编辑（zhang_editor）</option>
+                        <option value="admin">管理员（admin）</option>
+                        <option value="liuyi">刘意（liuyi）</option>
+                    </select>
+                </div>
+
+                <div class="permission-section">
+                    <h4 class="permission-section-title">例外权限</h4>
+                    <div class="permission-grid">
+                        <div class="permission-item menu-permission-item">
+                            <input type="checkbox" id="exceptionPermCorrectionManage">
+                            <label for="exceptionPermCorrectionManage">纠错管理权限（查看全部纠错信息并修改解决状态）</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; font-size: 13px; color: #856404;">
+                        <strong>说明：</strong>此处配置的权限为账户的额外权限，不受角色限制。例如：编辑角色的账户可在此单独配置纠错管理权限，无需将其调整为管理员角色。
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 20px;">
+                    <div class="table-container">
+                        <table id="exceptionPermissionsTable">
+                            <thead>
+                                <tr>
+                                    <th>账户</th>
+                                    <th>姓名</th>
+                                    <th>所属角色</th>
+                                    <th>纠错管理权限</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exceptionPermissionsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <button class="btn btn-primary" onclick="saveAccountExceptionPermissions()" style="padding: 10px 30px; font-size: 15px;">保存例外权限配置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function showUserInfo() {
+            alert('个人信息\n\n账号：wang_editor\n姓名：王编辑\n部门：理工事业部\n邮箱：wang@hep.com.cn\n电话：010-12345678');
+        }
+
+        function showPermissions() {
+            alert('菜单权限\n\n✓ 智能决策驾驶舱\n✓ 作者检索\n✓ 高校检索\n✓ 预警管理\n✓ 我的\n\n当前账号拥有所有菜单访问权限');
+        }
+
+        function showTabPermissions() {
+            alert('Tab页权限\n\n作者检索：全部Tab页\n高校检索：全部Tab页\n预警管理：全部Tab页\n\n当前账号拥有所有Tab页查看权限');
+        }
+
+        function logout() {
+            if (confirm('确定要退出系统吗？')) {
+                alert('已退出系统');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function toggleAllCheckboxes(checkbox) {
+            const activeContent = document.querySelector('.tab-content.active');
+            const checkboxes = activeContent.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = checkbox.checked);
+        }
+
+        function unfollowTeacher(name) {
+            if (confirm('确定要取消关注作者 "' + name + '" 吗？')) {
+                alert('已取消关注');
+            }
+        }
+
+        function filterTeachers() {
+            const startDate = document.getElementById('teacherStartDate').value;
+            const endDate = document.getElementById('teacherEndDate').value;
+            const table = document.querySelector('#tab-teachers table tbody');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const dateCell = row.querySelector('td:nth-child(7)');
+                if (dateCell) {
+                    const rowDate = dateCell.textContent.trim();
+                    let showRow = true;
+                    
+                    if (startDate && rowDate < startDate) {
+                        showRow = false;
+                    }
+                    if (endDate && rowDate > endDate) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                }
+            });
+        }
+
+        function filterAccessLogs() {
+            const startDate = document.getElementById('accessStartDate').value;
+            const endDate = document.getElementById('accessEndDate').value;
+            const logs = document.querySelectorAll('#tab-access .access-log-item');
+            
+            logs.forEach(log => {
+                const timeElement = log.querySelector('.access-log-time');
+                if (timeElement) {
+                    const logDate = timeElement.textContent.split(' ')[0];
+                    let showLog = true;
+                    
+                    if (startDate && logDate < startDate) {
+                        showLog = false;
+                    }
+                    if (endDate && logDate > endDate) {
+                        showLog = false;
+                    }
+                    
+                    log.style.display = showLog ? '' : 'none';
+                }
+            });
+        }
+
+        function filterContactLogs() {
+            const startDate = document.getElementById('contactStartDate').value;
+            const endDate = document.getElementById('contactEndDate').value;
+            const table = document.querySelector('#tab-contact table tbody');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const dateCell = row.querySelector('td:first-child');
+                if (dateCell) {
+                    const rowDate = dateCell.textContent.split(' ')[0];
+                    let showRow = true;
+                    
+                    if (startDate && rowDate < startDate) {
+                        showRow = false;
+                    }
+                    if (endDate && rowDate > endDate) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                }
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            const userInfo = document.querySelector('.user-info');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userInfo.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // 纠错管理权限控制
+        let currentAccount = '王编辑'; // 当前登录账号
+
+        // 账号到角色的映射
+        let accountToRole = {
+            '王编辑': 'editor',
+            '李编辑': 'editor',
+            '张编辑': 'user',
+            '管理员': 'admin',
+            '刘意': 'admin'
+        };
+
+        // 角色权限数据
+        const rolePermissions = {
+            'admin': {
+                menu: ['cockpit', 'teacherList', 'universityList', 'warning', 'my'],
+                tabs: {
+                    'teacherList': ['basic', 'academic', 'cooperation', 'industry', 'sample', 'risk', 'sentiment', 'mark'],
+                    'universityList': ['basic', 'teachers', 'cooperation'],
+                    'warning': ['monitor', 'my']
+                },
+                correctionManage: true,
+                export: { teacher: true, university: true, risk: true }
+            },
+            'editor': {
+                menu: ['cockpit', 'teacherList', 'universityList', 'warning', 'my'],
+                tabs: {
+                    'teacherList': ['basic', 'academic', 'cooperation', 'industry', 'sample', 'risk', 'sentiment', 'mark'],
+                    'universityList': ['basic', 'teachers', 'cooperation'],
+                    'warning': ['monitor', 'my']
+                },
+                correctionManage: false,
+                export: { teacher: false, university: false, risk: false }
+            },
+            'user': {
+                menu: ['cockpit', 'teacherList', 'my'],
+                tabs: {
+                    'teacherList': ['basic']
+                },
+                correctionManage: false,
+                export: { teacher: false, university: false, risk: false }
+            }
+        };
+
+        // 账户例外权限数据
+        const accountExceptionPermissions = {
+            'wang_editor': { correctionManage: false },
+            'li_editor': { correctionManage: false },
+            'zhang_editor': { correctionManage: false },
+            'admin': { correctionManage: true },
+            'liuyi': { correctionManage: true }
+        };
+
+        // 账户详细信息
+        const accountInfo = {
+            'wang_editor': { name: '王编辑', role: 'editor' },
+            'li_editor': { name: '李编辑', role: 'editor' },
+            'zhang_editor': { name: '张编辑', role: 'user' },
+            'admin': { name: '管理员', role: 'admin' },
+            'liuyi': { name: '刘意', role: 'admin' }
+        };
+
+        // 角色名称映射
+        const roleNameMap = {
+            'admin': '管理员',
+            'editor': '编辑',
+            'user': '普通用户'
+        };
+
+        // 加载例外权限概览表格
+        function loadExceptionPermissionsOverview() {
+            const tableBody = document.getElementById('exceptionPermissionsTableBody');
+            tableBody.innerHTML = '';
+
+            for (const accountId in accountExceptionPermissions) {
+                const perms = accountExceptionPermissions[accountId];
+                // 只显示已开通例外权限的账户
+                if (!perms.correctionManage) continue;
+
+                const info = accountInfo[accountId] || { name: accountId, role: '未知' };
+                const roleName = roleNameMap[info.role] || info.role;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${accountId}</td>
+                    <td>${info.name}</td>
+                    <td>${roleName}</td>
+                    <td>
+                        <span class="risk-badge" style="background: #52c41a; color: white;">已开通</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="removeExceptionPermission('${accountId}')">移除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        // 移除例外权限
+        function removeExceptionPermission(accountId) {
+            const info = accountInfo[accountId] || { name: accountId };
+            if (confirm('确定要移除账户 "' + info.name + '" 的纠错管理例外权限吗？')) {
+                accountExceptionPermissions[accountId].correctionManage = false;
+                loadExceptionPermissionsOverview();
+                alert('已移除账户 ' + info.name + ' 的纠错管理例外权限');
+            }
+        }
+
+        // 检查是否有纠错管理权限（基于角色+例外权限）
+        function hasCorrectionManagePermission() {
+            // 检查角色权限
+            const role = accountToRole[currentAccount];
+            if (role && rolePermissions[role] && rolePermissions[role].correctionManage) {
+                return true;
+            }
+            // 检查账户例外权限
+            const accountId = accountNameToAccountId[currentAccount];
+            if (accountId && accountExceptionPermissions[accountId] && accountExceptionPermissions[accountId].correctionManage) {
+                return true;
+            }
+            return false;
+        }
+
+        // 账号名称到accountId的映射
+        let accountNameToAccountId = {
+            '王编辑': 'wang_editor',
+            '李编辑': 'li_editor',
+            '张编辑': 'zhang_editor',
+            '管理员': 'admin',
+            '刘意': 'liuyi'
+        };
+
+        // 切换演示账号
+        function switchDemoAccount() {
+            currentAccount = document.getElementById('demoAccountSelect').value;
+            initCorrectionTab();
+        }
+
+        // 初始化纠错管理tab页
+        function initCorrectionTab() {
+            const tableBody = document.getElementById('correctionTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+            const actionHeader = document.getElementById('actionColumnHeader');
+            let visibleCount = 0;
+
+            if (hasCorrectionManagePermission()) {
+                // 管理员/指定账号：显示所有记录，可操作
+                document.getElementById('correctionTitle').textContent = '纠错管理';
+                document.getElementById('correctionPermissionHint').innerHTML = '<strong>权限说明：</strong>当前账号（' + currentAccount + '）拥有纠错管理权限，可查看全部纠错信息并修改解决状态。';
+
+                actionHeader.style.display = '';
+                rows.forEach(row => {
+                    row.style.display = '';
+                    visibleCount++;
+                    const statusDisplay = row.querySelector('.status-display');
+                    const statusSelect = row.querySelector('.status-select');
+                    const actionCell = row.querySelector('.action-cell');
+                    if (statusDisplay) statusDisplay.style.display = 'none';
+                    if (statusSelect) statusSelect.style.display = '';
+                    if (actionCell) actionCell.style.display = '';
+                });
+            } else {
+                // 普通账号：只显示自己提交的记录，只读
+                document.getElementById('correctionTitle').textContent = '我的纠错记录';
+                document.getElementById('correctionPermissionHint').innerHTML = '<strong>权限说明：</strong>当前账号只能查看自己提交的纠错记录。如需查看全部纠错信息并修改解决状态，请联系管理员或指定账号。';
+
+                actionHeader.style.display = 'none';
+                rows.forEach(row => {
+                    const submitter = row.getAttribute('data-submitter');
+                    if (submitter === currentAccount) {
+                        row.style.display = '';
+                        visibleCount++;
+                        const statusDisplay = row.querySelector('.status-display');
+                        const statusSelect = row.querySelector('.status-select');
+                        const actionCell = row.querySelector('.action-cell');
+                        if (statusDisplay) statusDisplay.style.display = '';
+                        if (statusSelect) statusSelect.style.display = 'none';
+                        if (actionCell) actionCell.style.display = 'none';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            document.getElementById('correctionCount').textContent = '共 ' + visibleCount + ' 条';
+        }
+
+        // 保存纠错状态
+        function saveCorrectionStatus(btn) {
+            const row = btn.closest('tr');
+            const select = row.querySelector('.status-select');
+            const statusValue = select.value;
+            const statusText = select.options[select.selectedIndex].text;
+
+            if (confirm('确定将此纠错记录状态修改为：' + statusText + '？')) {
+                row.setAttribute('data-status', statusValue);
+                // 更新显示的徽章
+                const statusDisplay = row.querySelector('.status-display');
+                if (statusDisplay) {
+                    const badgeColors = {
+                        'resolved': 'background: #52c41a; color: white;',
+                        'unresolved': 'background: #ff9800; color: white;',
+                        'notresolved': 'background: #dc3545; color: white;'
+                    };
+                    statusDisplay.innerHTML = '<span class="risk-badge" style="' + badgeColors[statusValue] + '">' + statusText + '</span>';
+                }
+                alert('已保存状态：' + statusText);
+                filterCorrectionTable();
+            }
+        }
+
+        // 筛选纠错状态
+        function filterCorrectionTable() {
+            const filterValue = document.getElementById('correctionStatusFilter').value;
+            const tableBody = document.getElementById('correctionTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const submitter = row.getAttribute('data-submitter');
+                const rowVisible = row.style.display !== 'none' && row.style.display !== '';
+
+                // 权限过滤
+                let permissionMatch = hasCorrectionManagePermission() || submitter === currentAccount;
+                let statusMatch = filterValue === 'all' || status === filterValue;
+
+                if (permissionMatch && statusMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('correctionCount').textContent = '共 ' + visibleCount + ' 条';
+        }
+
+        // 按日期筛选纠错
+        function filterCorrectionByDate() {
+            const startDate = document.getElementById('correctionStartDate').value;
+            const endDate = document.getElementById('correctionEndDate').value;
+            const statusFilter = document.getElementById('correctionStatusFilter').value;
+            const tableBody = document.getElementById('correctionTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+
+            let visibleCount = 0;
+            rows.forEach(row => {
+                const rowDate = row.getAttribute('data-date');
+                const status = row.getAttribute('data-status');
+                const submitter = row.getAttribute('data-submitter');
+
+                let permissionMatch = hasCorrectionManagePermission() || submitter === currentAccount;
+                let dateMatch = true;
+                let statusMatch = statusFilter === 'all' || status === statusFilter;
+
+                if (startDate && rowDate < startDate) dateMatch = false;
+                if (endDate && rowDate > endDate) dateMatch = false;
+
+                if (permissionMatch && dateMatch && statusMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('correctionCount').textContent = '共 ' + visibleCount + ' 条';
+        }
+
+        // 页面初始化
+        window.onload = function() {
+            initCorrectionTab();
+            loadExceptionPermissionsOverview();
+        };
+
+        // ========== 角色权限配置 ==========
+
+        function loadRolePermissions() {
+            const roleId = document.getElementById('roleSelect').value;
+            const permissions = rolePermissions[roleId] || { menu: [], tabs: {}, correctionManage: false };
+
+            // 菜单权限
+            document.getElementById('rolePermCockpit').checked = permissions.menu.includes('cockpit');
+            document.getElementById('rolePermTeacherList').checked = permissions.menu.includes('teacherList');
+            document.getElementById('rolePermUniversityList').checked = permissions.menu.includes('universityList');
+            document.getElementById('rolePermWarning').checked = permissions.menu.includes('warning');
+            document.getElementById('rolePermMy').checked = permissions.menu.includes('my');
+
+            // Tab页权限 - 作者检索
+            document.getElementById('roleTabTeacherListBasic').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('basic');
+            document.getElementById('roleTabTeacherListAcademic').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('academic');
+            document.getElementById('roleTabTeacherListCooperation').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('cooperation');
+            document.getElementById('roleTabTeacherListIndustry').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('industry');
+            document.getElementById('roleTabTeacherListSample').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('sample');
+            document.getElementById('roleTabTeacherListRisk').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('risk');
+            document.getElementById('roleTabTeacherListSentiment').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('sentiment');
+            document.getElementById('roleTabTeacherListMark').checked = permissions.tabs['teacherList'] && permissions.tabs['teacherList'].includes('mark');
+
+            // Tab页权限 - 高校检索
+            document.getElementById('roleTabUniversityListBasic').checked = permissions.tabs['universityList'] && permissions.tabs['universityList'].includes('basic');
+            document.getElementById('roleTabUniversityListTeachers').checked = permissions.tabs['universityList'] && permissions.tabs['universityList'].includes('teachers');
+            document.getElementById('roleTabUniversityListCooperation').checked = permissions.tabs['universityList'] && permissions.tabs['universityList'].includes('cooperation');
+
+            // Tab页权限 - 预警管理
+            document.getElementById('roleTabWarningMonitor').checked = permissions.tabs['warning'] && permissions.tabs['warning'].includes('monitor');
+            document.getElementById('roleTabWarningMy').checked = permissions.tabs['warning'] && permissions.tabs['warning'].includes('my');
+
+            // 纠错管理权限
+            document.getElementById('rolePermCorrectionManage').checked = permissions.correctionManage || false;
+
+            // 导出权限
+            const exportPerms = permissions.export || { teacher: false, university: false, risk: false };
+            document.getElementById('rolePermExportTeacher').checked = exportPerms.teacher || false;
+            document.getElementById('rolePermExportUniversity').checked = exportPerms.university || false;
+            document.getElementById('rolePermExportRisk').checked = exportPerms.risk || false;
+
+            // 触发菜单权限联动
+            syncTabPermissions('teacherList');
+            syncTabPermissions('universityList');
+            syncTabPermissions('warning');
+        }
+
+        // 菜单权限与Tab页权限联动
+        function syncTabPermissions(menuType) {
+            const menuCheckboxId = 'rolePerm' + menuType.charAt(0).toUpperCase() + menuType.slice(1);
+            const menuCheckbox = document.getElementById(menuCheckboxId);
+            const isChecked = menuCheckbox.checked;
+
+            // 将驼峰命名转换为小写连字符命名（teacherList -> teacher-list）
+            const classMenuType = menuType.replace(/([A-Z])/g, '-$1').toLowerCase();
+            const tabCheckboxClass = 'role-tab-perm-' + classMenuType;
+            const tabCheckboxes = document.querySelectorAll('.' + tabCheckboxClass);
+
+            tabCheckboxes.forEach(checkbox => {
+                checkbox.disabled = !isChecked;
+                if (!isChecked) {
+                    checkbox.checked = false;
+                }
+                // 更新样式显示禁用状态
+                const label = checkbox.nextElementSibling;
+                const parentItem = checkbox.closest('.permission-item');
+                if (!isChecked) {
+                    parentItem.style.opacity = '0.5';
+                    parentItem.style.cursor = 'not-allowed';
+                    if (label) label.style.cursor = 'not-allowed';
+                } else {
+                    parentItem.style.opacity = '1';
+                    parentItem.style.cursor = 'pointer';
+                    if (label) label.style.cursor = 'pointer';
+                }
+            });
+        }
+
+        function saveRolePermissions() {
+            const roleId = document.getElementById('roleSelect').value;
+            const roleSelect = document.getElementById('roleSelect');
+            const roleName = roleSelect.options[roleSelect.selectedIndex].text;
+
+            // 收集菜单权限并更新数据
+            const menuPermissions = [];
+            const menuArr = [];
+            if (document.getElementById('rolePermCockpit').checked) { menuPermissions.push('智能决策驾驶舱'); menuArr.push('cockpit'); }
+            if (document.getElementById('rolePermTeacherList').checked) { menuPermissions.push('作者检索'); menuArr.push('teacherList'); }
+            if (document.getElementById('rolePermUniversityList').checked) { menuPermissions.push('高校检索'); menuArr.push('universityList'); }
+            if (document.getElementById('rolePermWarning').checked) { menuPermissions.push('预警管理'); menuArr.push('warning'); }
+            if (document.getElementById('rolePermMy').checked) { menuPermissions.push('我的'); menuArr.push('my'); }
+
+            // 收集Tab页权限并更新数据
+            const tabPermissions = [];
+            const tabsObj = {};
+
+            const teacherListTabs = [];
+            const teacherListArr = [];
+            if (document.getElementById('roleTabTeacherListBasic').checked) { teacherListTabs.push('基础信息'); teacherListArr.push('basic'); }
+            if (document.getElementById('roleTabTeacherListAcademic').checked) { teacherListTabs.push('学术能力'); teacherListArr.push('academic'); }
+            if (document.getElementById('roleTabTeacherListCooperation').checked) { teacherListTabs.push('社内合作'); teacherListArr.push('cooperation'); }
+            if (document.getElementById('roleTabTeacherListIndustry').checked) { teacherListTabs.push('行业出书'); teacherListArr.push('industry'); }
+            if (document.getElementById('roleTabTeacherListSample').checked) { teacherListTabs.push('样书领用'); teacherListArr.push('sample'); }
+            if (document.getElementById('roleTabTeacherListRisk').checked) { teacherListTabs.push('风险预警'); teacherListArr.push('risk'); }
+            if (document.getElementById('roleTabTeacherListSentiment').checked) { teacherListTabs.push('舆情信息'); teacherListArr.push('sentiment'); }
+            if (document.getElementById('roleTabTeacherListMark').checked) { teacherListTabs.push('数据纠错'); teacherListArr.push('mark'); }
+            if (teacherListTabs.length > 0) tabPermissions.push('作者检索：' + teacherListTabs.join('、'));
+            if (teacherListArr.length > 0) tabsObj['teacherList'] = teacherListArr;
+
+            const universityListTabs = [];
+            const universityListArr = [];
+            if (document.getElementById('roleTabUniversityListBasic').checked) { universityListTabs.push('基础信息'); universityListArr.push('basic'); }
+            if (document.getElementById('roleTabUniversityListTeachers').checked) { universityListTabs.push('收录教师'); universityListArr.push('teachers'); }
+            if (document.getElementById('roleTabUniversityListCooperation').checked) { universityListTabs.push('合作情况'); universityListArr.push('cooperation'); }
+            if (universityListTabs.length > 0) tabPermissions.push('高校检索：' + universityListTabs.join('、'));
+            if (universityListArr.length > 0) tabsObj['universityList'] = universityListArr;
+
+            const warningTabs = [];
+            const warningArr = [];
+            if (document.getElementById('roleTabWarningMonitor').checked) { warningTabs.push('预警监控'); warningArr.push('monitor'); }
+            if (document.getElementById('roleTabWarningMy').checked) { warningTabs.push('我的监控'); warningArr.push('my'); }
+            if (warningTabs.length > 0) tabPermissions.push('预警管理：' + warningTabs.join('、'));
+            if (warningArr.length > 0) tabsObj['warning'] = warningArr;
+
+            // 纠错管理权限
+            const correctionManagePermission = document.getElementById('rolePermCorrectionManage').checked;
+
+            // 导出权限
+            const exportPerms = {
+                teacher: document.getElementById('rolePermExportTeacher').checked,
+                university: document.getElementById('rolePermExportUniversity').checked,
+                risk: document.getElementById('rolePermExportRisk').checked
+            };
+            const exportList = [];
+            if (exportPerms.teacher) exportList.push('作者检索');
+            if (exportPerms.university) exportList.push('高校检索');
+            if (exportPerms.risk) exportList.push('风险预警');
+
+            // 更新角色权限数据
+            rolePermissions[roleId] = {
+                menu: menuArr,
+                tabs: tabsObj,
+                correctionManage: correctionManagePermission,
+                export: exportPerms
+            };
+
+            alert('角色权限配置已保存！\n\n角色：' + roleName + '\n\n菜单权限：\n' + menuPermissions.join('\n') + '\n\nTab页权限：\n' + tabPermissions.join('\n') + '\n\n纠错管理权限：' + (correctionManagePermission ? '已开通' : '未开通') + '\n\n导出权限：' + (exportList.length > 0 ? exportList.join('、') : '未开通'));
+        }
+
+        // ========== 角色人员配置 ==========
+
+        // 角色人员数据
+        const roleMembers = {
+            'admin': [
+                { account: 'admin', name: '管理员', department: '系统管理部', addTime: '2024-01-01' },
+                { account: 'liuyi', name: '刘意', department: '编辑部', addTime: '2024-01-01' }
+            ],
+            'editor': [
+                { account: 'wang_editor', name: '王编辑', department: '理工事业部', addTime: '2024-02-15' },
+                { account: 'li_editor', name: '李编辑', department: '文理事业部', addTime: '2024-02-20' }
+            ],
+            'user': [
+                { account: 'zhang_editor', name: '张编辑', department: '理工事业部', addTime: '2024-03-01' }
+            ]
+        };
+
+        function loadRoleMembers() {
+            const roleId = document.getElementById('roleMemberSelect').value;
+            const members = roleMembers[roleId] || [];
+            const tableBody = document.getElementById('roleMembersTableBody');
+
+            tableBody.innerHTML = '';
+            members.forEach(member => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${member.account}</td>
+                    <td>${member.name}</td>
+                    <td>${member.department}</td>
+                    <td>${member.addTime}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="removeRoleMember('${member.account}')">移除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function addRoleMember() {
+            const roleId = document.getElementById('roleMemberSelect').value;
+            const input = document.getElementById('newMemberInput');
+            const value = input.value.trim();
+
+            if (!value) {
+                alert('请输入账号或姓名');
+                return;
+            }
+
+            // 检查是否已存在
+            const members = roleMembers[roleId] || [];
+            if (members.some(m => m.account === value)) {
+                alert('账号 "' + value + '" 已存在于当前角色中');
+                return;
+            }
+
+            // 模拟添加人员
+            const newMember = {
+                account: value,
+                name: value + '（新添加）',
+                department: '待分配',
+                addTime: new Date().toISOString().split('T')[0]
+            };
+
+            roleMembers[roleId].push(newMember);
+
+            // 更新账号到角色的映射
+            updateAccountToRoleMapping();
+
+            loadRoleMembers();
+            input.value = '';
+
+            alert('已添加人员：' + value);
+        }
+
+        function removeRoleMember(account) {
+            const roleId = document.getElementById('roleMemberSelect').value;
+
+            if (confirm('确定要移除账号 "' + account + '" 吗？')) {
+                const members = roleMembers[roleId];
+                const index = members.findIndex(m => m.account === account);
+                if (index > -1) {
+                    members.splice(index, 1);
+
+                    // 更新账号到角色的映射
+                    updateAccountToRoleMapping();
+
+                    loadRoleMembers();
+                    alert('已移除人员：' + account);
+                }
+            }
+        }
+
+        // 根据roleMembers更新accountToRole映射
+        function updateAccountToRoleMapping() {
+            // 清空现有映射
+            accountToRole = {};
+
+            // 根据角色人员数据重建映射
+            for (const roleId in roleMembers) {
+                roleMembers[roleId].forEach(member => {
+                    // 根据accountId或account名称映射到角色
+                    const accountId = member.account;
+                    // 尝试从accountId推导账号名称（原型简化处理）
+                    let accountName;
+                    if (accountId === 'admin') {
+                        accountName = '管理员';
+                    } else if (accountId === 'liuyi') {
+                        accountName = '刘意';
+                    } else if (accountId === 'wang_editor') {
+                        accountName = '王编辑';
+                    } else if (accountId === 'li_editor') {
+                        accountName = '李编辑';
+                    } else if (accountId === 'zhang_editor') {
+                        accountName = '张编辑';
+                    } else {
+                        // 新添加的账号，使用name作为key
+                        accountName = member.name.replace('（新添加）', '');
+                    }
+
+                    accountToRole[accountName] = roleId;
+                    accountNameToAccountId[accountName] = accountId;
+                });
+            }
+        }
+
+        function saveRoleMembers() {
+            const roleId = document.getElementById('roleMemberSelect').value;
+            const roleSelect = document.getElementById('roleMemberSelect');
+            const roleName = roleSelect.options[roleSelect.selectedIndex].text;
+            const members = roleMembers[roleId] || [];
+
+            const memberList = members.map(m => m.name + '（' + m.account + '）').join('\n');
+
+            alert('角色人员配置已保存！\n\n角色：' + roleName + '\n\n人员列表：\n' + memberList);
+        }
+
+        // ========== 账户例外权限配置 ==========
+
+        function loadAccountExceptionPermissions() {
+            const accountId = document.getElementById('exceptionAccountSelect').value;
+            const permissions = accountExceptionPermissions[accountId] || { correctionManage: false };
+
+            document.getElementById('exceptionPermCorrectionManage').checked = permissions.correctionManage || false;
+        }
+
+        function saveAccountExceptionPermissions() {
+            const accountId = document.getElementById('exceptionAccountSelect').value;
+            const accountSelect = document.getElementById('exceptionAccountSelect');
+            const accountName = accountSelect.options[accountSelect.selectedIndex].text;
+
+            const correctionManagePermission = document.getElementById('exceptionPermCorrectionManage').checked;
+
+            // 更新例外权限数据
+            if (accountExceptionPermissions[accountId]) {
+                accountExceptionPermissions[accountId].correctionManage = correctionManagePermission;
+            } else {
+                accountExceptionPermissions[accountId] = { correctionManage: correctionManagePermission };
+            }
+
+            // 刷新概览表格
+            loadExceptionPermissionsOverview();
+
+            alert('账户例外权限配置已保存！\n\n账户：' + accountName + '\n\n纠错管理权限：' + (correctionManagePermission ? '已开通' : '未开通') + '\n\n说明：此权限为账户额外权限，不受角色限制。');
+        }
+    </script>
+</body>
+</html>
