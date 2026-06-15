@@ -384,6 +384,7 @@
                 <a href="university-list.html">高校检索</a>
                 <a href="warning-management.html">预警管理</a>
                 <a href="sentiment-list.html">舆情信息</a>
+                <a href="feedback-management.html" style="display: none;" id="feedbackManagementLink">反馈管理</a>
                 <a href="my.html" class="active">我的</a>
             </nav>
         </div>
@@ -413,6 +414,7 @@
             <button class="tab-btn" onclick="switchTab('correction')">纠错管理</button>
             <button class="tab-btn" onclick="switchTab('rolePermissions')">角色权限配置</button>
             <button class="tab-btn" onclick="switchTab('roleMembers')">角色人员配置</button>
+            <button class="tab-btn" onclick="switchTab('feedback')">意见反馈</button>
         </div>
 
         <div id="tab-teachers" class="tab-content active">
@@ -822,6 +824,71 @@
             </div>
         </div>
 
+        <!-- 意见反馈 Tab -->
+        <div id="tab-feedback" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">我的反馈</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button class="btn btn-primary" onclick="showFeedbackSubmitModal()">提交反馈</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>提交时间</th>
+                                <th>反馈标题</th>
+                                <th>反馈类型</th>
+                                <th>优先级</th>
+                                <th>相关模块</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackListBody">
+                            <tr>
+                                <td>2026-06-08 14:30</td>
+                                <td>系统登录失败</td>
+                                <td><span style="background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 4px; font-size: 12px;">系统问题</span></td>
+                                <td><span style="background: #fff3e0; color: #e65100; padding: 4px 12px; border-radius: 4px; font-size: 12px;">高</span></td>
+                                <td>作者管理</td>
+                                <td><span style="background: #fff3e0; color: #e65100; padding: 4px 12px; border-radius: 4px; font-size: 12px;">待处理</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm" onclick="showFeedbackDetailModal('FB202606080001')">查看详情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2026-06-07 10:20</td>
+                                <td>高校数据缺失</td>
+                                <td><span style="background: #fce4ec; color: #c2185b; padding: 4px 12px; border-radius: 4px; font-size: 12px;">数据问题</span></td>
+                                <td><span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 4px; font-size: 12px;">中</span></td>
+                                <td>高校管理</td>
+                                <td><span style="background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 4px; font-size: 12px;">处理中</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm" onclick="showFeedbackDetailModal('FB202606070001')">查看详情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2026-06-05 16:45</td>
+                                <td>建议增加导出功能</td>
+                                <td><span style="background: #f3e5f5; color: #7b1fa2; padding: 4px 12px; border-radius: 4px; font-size: 12px;">需求建议</span></td>
+                                <td><span style="background: #fafafa; color: #616161; padding: 4px 12px; border-radius: 4px; font-size: 12px;">低</span></td>
+                                <td>预警管理</td>
+                                <td><span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 4px; font-size: 12px;">已处理</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm" onclick="showFeedbackDetailModal('FB202606050001')">查看详情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 13px; color: #6c757d; text-align: center;">
+                    暂无反馈记录
+                </div>
+            </div>
+        </div>
+
         <div id="tab-rolePermissions" class="tab-content">
             <div class="card">
                 <div class="card-header">
@@ -1079,6 +1146,132 @@
                 <div style="margin-top: 30px; text-align: center;">
                     <button class="btn btn-primary" onclick="saveAccountExceptionPermissions()" style="padding: 10px 30px; font-size: 15px;">保存例外权限配置</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈提交弹窗 -->
+    <div class="modal" id="feedbackSubmitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="background: white; border-radius: 8px; padding: 30px; max-width: 600px; width: 90%; margin: 50px auto; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 600; color: #1e3a8a;">提交反馈</h3>
+                <button style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;" onclick="closeFeedbackSubmitModal()">×</button>
+            </div>
+            <div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">反馈类型 *</label>
+                    <select id="feedbackType" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="">请选择</option>
+                        <option value="系统问题">系统问题</option>
+                        <option value="数据问题">数据问题</option>
+                        <option value="需求建议">需求建议</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">反馈标题 *（最多50字符）</label>
+                    <input type="text" id="feedbackTitle" maxlength="50" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" placeholder="请输入反馈标题">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">反馈内容 *（最多500字符）</label>
+                    <textarea id="feedbackContent" maxlength="500" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-height: 100px;" placeholder="请详细描述反馈内容"></textarea>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">优先级 *</label>
+                    <select id="feedbackPriority" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="">请选择</option>
+                        <option value="紧急">紧急</option>
+                        <option value="高">高</option>
+                        <option value="中">中</option>
+                        <option value="低">低</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">相关模块 *</label>
+                    <select id="feedbackModule" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                        <option value="">请选择</option>
+                        <option value="作者管理">作者管理</option>
+                        <option value="高校管理">高校管理</option>
+                        <option value="预警管理">预警管理</option>
+                        <option value="舆情信息">舆情信息</option>
+                        <option value="我的">我的</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeFeedbackSubmitModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitFeedback()">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈详情弹窗 -->
+    <div class="modal" id="feedbackDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="background: white; border-radius: 8px; padding: 30px; max-width: 600px; width: 90%; margin: 50px auto; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 600; color: #1e3a8a;">反馈详情</h3>
+                <button style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;" onclick="closeFeedbackDetailModal()">×</button>
+            </div>
+            <div id="feedbackDetailContent">
+                <!-- 基本信息 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1e3a8a; margin-bottom: 10px;">基本信息</h4>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">反馈类型</div>
+                        <div id="detailFeedbackType" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">反馈标题</div>
+                        <div id="detailFeedbackTitle" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">反馈内容</div>
+                        <div id="detailFeedbackContent" style="flex: 1; color: #333; white-space: pre-wrap;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">优先级</div>
+                        <div id="detailFeedbackPriority" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">相关模块</div>
+                        <div id="detailFeedbackModule" style="flex: 1; color: #333;"></div>
+                    </div>
+                </div>
+                <!-- 提交信息 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1e3a8a; margin-bottom: 10px;">提交信息</h4>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">提交人</div>
+                        <div id="detailSubmitter" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">提交时间</div>
+                        <div id="detailSubmitTime" style="flex: 1; color: #333;"></div>
+                    </div>
+                </div>
+                <!-- 处理信息 -->
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1e3a8a; margin-bottom: 10px;">处理信息</h4>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">当前状态</div>
+                        <div id="detailStatus" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">处理说明</div>
+                        <div id="detailProcessDescription" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">处理人</div>
+                        <div id="detailProcessor" style="flex: 1; color: #333;"></div>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <div style="width: 120px; color: #6c757d; font-weight: 500;">处理时间</div>
+                        <div id="detailProcessTime" style="flex: 1; color: #333;"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeFeedbackDetailModal()">关闭</button>
             </div>
         </div>
     </div>
@@ -1799,6 +1992,264 @@
 
             alert('账户例外权限配置已保存！\n\n账户：' + accountName + '\n\n纠错管理权限：' + (correctionManagePermission ? '已开通' : '未开通') + '\n\n说明：此权限为账户额外权限，不受角色限制。');
         }
+
+        // ========== 意见反馈功能 ==========
+
+        // 模拟反馈数据
+        const feedbackData = {
+            'FB202606080001': {
+                id: 'FB202606080001',
+                type: '系统问题',
+                title: '系统登录失败',
+                content: '使用账号wang_editor登录时提示账号不存在，但账号确实存在，请检查登录验证逻辑。',
+                priority: '高',
+                module: '作者管理',
+                submitter: '王编辑',
+                submitterAccount: 'wang_editor',
+                submitTime: '2026-06-08 14:30',
+                status: '待处理',
+                processor: null,
+                processorAccount: null,
+                processTime: null,
+                processDescription: null
+            },
+            'FB202606070001': {
+                id: 'FB202606070001',
+                type: '数据问题',
+                title: '高校数据缺失',
+                content: '在高校检索页面，发现北京师范大学的数据缺失，包括基本信息和收录教师信息。',
+                priority: '中',
+                module: '高校管理',
+                submitter: '王编辑',
+                submitterAccount: 'wang_editor',
+                submitTime: '2026-06-07 10:20',
+                status: '处理中',
+                processor: '张管理员',
+                processorAccount: 'admin',
+                processTime: '2026-06-07 15:00',
+                processDescription: '正在核查数据源，预计明天补充完整数据。'
+            },
+            'FB202606050001': {
+                id: 'FB202606050001',
+                type: '需求建议',
+                title: '建议增加导出功能',
+                content: '在预警管理页面，建议增加批量导出功能，方便将预警数据导出为Excel或CSV格式进行分析和汇报。',
+                priority: '低',
+                module: '预警管理',
+                submitter: '王编辑',
+                submitterAccount: 'wang_editor',
+                submitTime: '2026-06-05 16:45',
+                status: '已处理',
+                processor: '李管理员',
+                processorAccount: 'liuyi',
+                processTime: '2026-06-06 10:00',
+                processDescription: '已采纳建议，将在下次迭代中增加导出功能。'
+            }
+        };
+
+        // 显示反馈提交弹窗
+        function showFeedbackSubmitModal() {
+            document.getElementById('feedbackSubmitModal').style.display = 'block';
+            // 清空表单
+            document.getElementById('feedbackType').value = '';
+            document.getElementById('feedbackTitle').value = '';
+            document.getElementById('feedbackContent').value = '';
+            document.getElementById('feedbackPriority').value = '';
+            document.getElementById('feedbackModule').value = '';
+        }
+
+        // 关闭反馈提交弹窗
+        function closeFeedbackSubmitModal() {
+            document.getElementById('feedbackSubmitModal').style.display = 'none';
+        }
+
+        // 提交反馈
+        function submitFeedback() {
+            const type = document.getElementById('feedbackType').value;
+            const title = document.getElementById('feedbackTitle').value;
+            const content = document.getElementById('feedbackContent').value;
+            const priority = document.getElementById('feedbackPriority').value;
+            const module = document.getElementById('feedbackModule').value;
+
+            // 验证必填字段
+            if (!type || !title || !content || !priority || !module) {
+                alert('请填写所有必填字段');
+                return;
+            }
+
+            // 验证标题长度
+            if (title.length > 50) {
+                alert('反馈标题最多50字符');
+                return;
+            }
+
+            // 验证内容长度
+            if (content.length > 500) {
+                alert('反馈内容最多500字符');
+                return;
+            }
+
+            // 模拟提交成功
+            const feedbackId = 'FB' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '00' + (Object.keys(feedbackData).length + 1);
+            const submitTime = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
+
+            // 添加到反馈数据
+            feedbackData[feedbackId] = {
+                id: feedbackId,
+                type: type,
+                title: title,
+                content: content,
+                priority: priority,
+                module: module,
+                submitter: currentAccount,
+                submitterAccount: accountNameToAccountId[currentAccount],
+                submitTime: submitTime,
+                status: '待处理',
+                processor: null,
+                processorAccount: null,
+                processTime: null,
+                processDescription: null
+            };
+
+            // 添加到列表表格
+            const tbody = document.getElementById('feedbackListBody');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${submitTime}</td>
+                <td>${title}</td>
+                <td><span style="background: ${getTypeColor(type)}; color: ${getTypeTextColor(type)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${type}</span></td>
+                <td><span style="background: ${getPriorityColor(priority)}; color: ${getPriorityTextColor(priority)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${priority}</span></td>
+                <td>${module}</td>
+                <td><span style="background: ${getStatusColor('待处理')}; color: ${getStatusTextColor('待处理')}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">待处理</span></td>
+                <td>
+                    <button class="btn btn-outline btn-sm" onclick="showFeedbackDetailModal('${feedbackId}')">查看详情</button>
+                </td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            // 关闭弹窗并显示成功提示
+            closeFeedbackSubmitModal();
+            alert('反馈提交成功！\n\n反馈ID：' + feedbackId + '\n提交时间：' + submitTime + '\n\n感谢您的反馈，我们会尽快处理。');
+        }
+
+        // 显示反馈详情弹窗
+        function showFeedbackDetailModal(feedbackId) {
+            const feedback = feedbackData[feedbackId];
+            if (!feedback) {
+                alert('反馈不存在');
+                return;
+            }
+
+            // 填充基本信息
+            document.getElementById('detailFeedbackType').innerHTML = `<span style="background: ${getTypeColor(feedback.type)}; color: ${getTypeTextColor(feedback.type)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${feedback.type}</span>`;
+            document.getElementById('detailFeedbackTitle').textContent = feedback.title;
+            document.getElementById('detailFeedbackContent').textContent = feedback.content;
+            document.getElementById('detailFeedbackPriority').innerHTML = `<span style="background: ${getPriorityColor(feedback.priority)}; color: ${getPriorityTextColor(feedback.priority)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${feedback.priority}</span>`;
+            document.getElementById('detailFeedbackModule').textContent = feedback.module;
+
+            // 填充提交信息
+            document.getElementById('detailSubmitter').textContent = feedback.submitter + '（' + feedback.submitterAccount + ')';
+            document.getElementById('detailSubmitTime').textContent = feedback.submitTime;
+
+            // 填充处理信息
+            document.getElementById('detailStatus').innerHTML = `<span style="background: ${getStatusColor(feedback.status)}; color: ${getStatusTextColor(feedback.status)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${feedback.status}</span>`;
+            document.getElementById('detailProcessDescription').textContent = feedback.processDescription || '-';
+            document.getElementById('detailProcessor').textContent = feedback.processor ? feedback.processor + '（' + feedback.processorAccount + ')' : '-';
+            document.getElementById('detailProcessTime').textContent = feedback.processTime || '-';
+
+            // 显示弹窗
+            document.getElementById('feedbackDetailModal').style.display = 'block';
+        }
+
+        // 关闭反馈详情弹窗
+        function closeFeedbackDetailModal() {
+            document.getElementById('feedbackDetailModal').style.display = 'none';
+        }
+
+        // 获取类型颜色
+        function getTypeColor(type) {
+            const colors = {
+                '系统问题': '#e3f2fd',
+                '数据问题': '#fce4ec',
+                '需求建议': '#f3e5f5'
+            };
+            return colors[type] || '#f3f4f6';
+        }
+
+        // 获取类型文字颜色
+        function getTypeTextColor(type) {
+            const colors = {
+                '系统问题': '#1976d2',
+                '数据问题': '#c2185b',
+                '需求建议': '#7b1fa2'
+            };
+            return colors[type] || '#374151';
+        }
+
+        // 获取优先级颜色
+        function getPriorityColor(priority) {
+            const colors = {
+                '紧急': '#fee2e2',
+                '高': '#fff3e0',
+                '中': '#e8f5e9',
+                '低': '#fafafa'
+            };
+            return colors[priority] || '#f3f4f6';
+        }
+
+        // 获取优先级文字颜色
+        function getPriorityTextColor(priority) {
+            const colors = {
+                '紧急': '#991b1b',
+                '高': '#e65100',
+                '中': '#2e7d32',
+                '低': '#616161'
+            };
+            return colors[priority] || '#374151';
+        }
+
+        // 获取状态颜色
+        function getStatusColor(status) {
+            const colors = {
+                '待处理': '#fff3e0',
+                '处理中': '#e3f2fd',
+                '已处理': '#e8f5e9',
+                '已关闭': '#f3f4f6'
+            };
+            return colors[status] || '#f3f4f6';
+        }
+
+        // 获取状态文字颜色
+        function getStatusTextColor(status) {
+            const colors = {
+                '待处理': '#e65100',
+                '处理中': '#1976d2',
+                '已处理': '#2e7d32',
+                '已关闭': '#616161'
+            };
+            return colors[status] || '#374151';
+        }
+
+        // 初始化反馈管理菜单链接显示（仅管理员可见）
+        function initFeedbackManagementLink() {
+            const link = document.getElementById('feedbackManagementLink');
+            if (link) {
+                // 判断当前账号是否为管理员
+                const role = accountToRole[currentAccount];
+                if (role === 'admin') {
+                    link.style.display = '';
+                } else {
+                    link.style.display = 'none';
+                }
+            }
+        }
+
+        // 页面初始化时调用
+        window.onload = function() {
+            initCorrectionTab();
+            loadExceptionPermissionsOverview();
+            initFeedbackManagementLink();
+        };
     </script>
 </body>
 </html>

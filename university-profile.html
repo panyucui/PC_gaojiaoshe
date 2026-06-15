@@ -514,6 +514,7 @@
                 <a href="university-list.html">高校检索</a>
                 <a href="warning-management.html">预警管理</a>
                 <a href="sentiment-list.html">舆情信息</a>
+                <a href="feedback-management.html" id="feedbackManagementLink" style="display: none;">反馈管理</a>
                 <a href="my.html">我的</a>
             </nav>
         </div>
@@ -935,7 +936,7 @@
                 <div class="section">
                     <div class="section-title">产品选用明细</div>
                     <div class="filter-bar">
-                        <input type="text" placeholder="搜索书名/物料号/ISBN/流向单位">
+                        <input type="text" placeholder="搜索书名/物料号/ISBN">
                         <button onclick="searchProducts()">搜索</button>
                     </div>
                     <div class="table-container">
@@ -947,7 +948,6 @@
                                     <th>ISBN</th>
                                     <th>物料号</th>
                                     <th>作者</th>
-                                    <th>流向单位</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -957,7 +957,6 @@
                                     <td>978-7-04-060908-0</td>
                                     <td>60908-A0</td>
                                     <td>-</td>
-                                    <td>晋中市卫生学校</td>
                                 </tr>
                                 <tr>
                                     <td>思想政治 基础模块 职业道德与法治</td>
@@ -965,7 +964,6 @@
                                     <td>978-7-04-060910-3</td>
                                     <td>60910-A0</td>
                                     <td>-</td>
-                                    <td>晋中市卫生学校</td>
                                 </tr>
                                 <tr>
                                     <td>历史 基础模块 世界历史</td>
@@ -973,7 +971,6 @@
                                     <td>978-7-04-060911-0</td>
                                     <td>60911-A0</td>
                                     <td>-</td>
-                                    <td>晋中市卫生学校</td>
                                 </tr>
                                 <tr>
                                     <td>医药市场营销</td>
@@ -981,7 +978,6 @@
                                     <td>978-7-04-053862-5</td>
                                     <td>53862-A0</td>
                                     <td>彭智海、李明</td>
-                                    <td>高教社储运中心</td>
                                 </tr>
                                 <tr>
                                     <td>机械原理 第九版</td>
@@ -989,7 +985,6 @@
                                     <td>978-7-04-055589-9</td>
                                     <td>55589-A0</td>
                                     <td>孙桓、陈作模</td>
-                                    <td>高教社储运中心</td>
                                 </tr>
                                 <tr>
                                     <td>药物化学(第3版)</td>
@@ -997,7 +992,6 @@
                                     <td>978-7-04-057508-8</td>
                                     <td>57508-A0</td>
                                     <td>徐文方、方浩</td>
-                                    <td>高教社储运中心</td>
                                 </tr>
                                 <tr>
                                     <td>体育产业概论(第三版)</td>
@@ -1005,7 +999,6 @@
                                     <td>978-7-04-063746-5</td>
                                     <td>63746-00</td>
                                     <td>-</td>
-                                    <td>高教社储运中心</td>
                                 </tr>
                                 <tr>
                                     <td>语文 职业模块</td>
@@ -1013,7 +1006,6 @@
                                     <td>978-7-04-060913-4</td>
                                     <td>60913-A0</td>
                                     <td>-</td>
-                                    <td>北京大学教务处</td>
                                 </tr>
                                 <tr>
                                     <td>外国舞蹈史及作品鉴赏</td>
@@ -1021,7 +1013,6 @@
                                     <td>978-7-04-019336-7</td>
                                     <td>19336-00</td>
                                     <td>欧建平</td>
-                                    <td>北京大学艺术学院</td>
                                 </tr>
                                 <tr>
                                     <td>材料科学基础(第2版)</td>
@@ -1029,7 +1020,6 @@
                                     <td>978-7-04-035103-3</td>
                                     <td>35103-A0</td>
                                     <td>胡赓祥、蔡珣</td>
-                                    <td>北京大学工学院</td>
                                 </tr>
                             </tbody>
                         </table>

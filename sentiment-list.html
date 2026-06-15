@@ -141,6 +141,7 @@
             padding: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             flex: 1;
+            text-align: center;
         }
         .stat-card .label {
             font-size: 14px;
@@ -502,6 +503,7 @@
                 <a href="university-list.html">高校列表</a>
                 <a href="warning-management.html">预警管理</a>
                 <a href="sentiment-list.html" class="active">舆情信息</a>
+                <a href="feedback-management.html" id="feedbackManagementLink" style="display: none;">反馈管理</a>
                 <a href="my.html">我的</a>
             </nav>
         </div>
@@ -563,14 +565,7 @@
                 </div>
                 <div class="filter-item">
                     <label>来源渠道</label>
-                    <select id="sourceChannel">
-                        <option value="">全部</option>
-                        <option value="news">新闻媒体</option>
-                        <option value="social">社交媒体</option>
-                        <option value="academic">学术平台</option>
-                        <option value="official">官方发布</option>
-                        <option value="ai">AI采集</option>
-                    </select>
+                    <input type="text" id="sourceChannel" placeholder="请输入搜索关键词">
                 </div>
             </div>
             <div class="filter-row">
