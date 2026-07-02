@@ -1176,6 +1176,16 @@
                     <textarea id="feedbackContent" maxlength="500" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-height: 100px;" placeholder="请详细描述反馈内容"></textarea>
                 </div>
                 <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">附件/截图</label>
+                    <div id="feedbackUploadArea" style="border: 2px dashed #d9d9d9; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fafafa;" onclick="document.getElementById('feedbackFileInput').click()" onmouseover="this.style.borderColor='#1e3a8a'; this.style.background='#f0f5ff'" onmouseout="this.style.borderColor='#d9d9d9'; this.style.background='#fafafa'">
+                        <div style="font-size: 32px; color: #bbb; margin-bottom: 8px;">📎</div>
+                        <div style="font-size: 14px; color: #666;">点击或拖拽文件到此处上传</div>
+                        <div style="font-size: 12px; color: #999; margin-top: 4px;">支持图片（PNG、JPG）和文档（PDF、DOC、DOCX），单个文件不超过10MB</div>
+                    </div>
+                    <input type="file" id="feedbackFileInput" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;" onchange="handleFeedbackFileSelect(event)">
+                    <div id="feedbackFileList" style="margin-top: 10px;"></div>
+                </div>
+                <div style="margin-bottom: 15px;">
                     <label style="display: block; font-size: 14px; color: #666; margin-bottom: 5px;">优先级 *</label>
                     <select id="feedbackPriority" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                         <option value="">请选择</option>
@@ -1236,6 +1246,11 @@
                         <div style="width: 120px; color: #6c757d; font-weight: 500;">相关模块</div>
                         <div id="detailFeedbackModule" style="flex: 1; color: #333;"></div>
                     </div>
+                </div>
+                <!-- 附件信息 -->
+                <div id="detailAttachmentsSection" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; color: #1e3a8a; margin-bottom: 10px;">附件信息</h4>
+                    <div id="detailAttachments" style="color: #333;">无附件</div>
                 </div>
                 <!-- 提交信息 -->
                 <div style="margin-bottom: 20px;">
@@ -2047,6 +2062,9 @@
             }
         };
 
+        // 附件上传相关变量
+        let feedbackAttachments = [];
+
         // 显示反馈提交弹窗
         function showFeedbackSubmitModal() {
             document.getElementById('feedbackSubmitModal').style.display = 'block';
@@ -2056,11 +2074,111 @@
             document.getElementById('feedbackContent').value = '';
             document.getElementById('feedbackPriority').value = '';
             document.getElementById('feedbackModule').value = '';
+            // 清空附件
+            feedbackAttachments = [];
+            document.getElementById('feedbackFileInput').value = '';
+            document.getElementById('feedbackFileList').innerHTML = '';
+            // 初始化拖拽上传
+            initFeedbackDragUpload();
         }
 
         // 关闭反馈提交弹窗
         function closeFeedbackSubmitModal() {
             document.getElementById('feedbackSubmitModal').style.display = 'none';
+        }
+
+        // 初始化拖拽上传
+        function initFeedbackDragUpload() {
+            const uploadArea = document.getElementById('feedbackUploadArea');
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#1e3a8a';
+                this.style.background = '#e6f0ff';
+            });
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#d9d9d9';
+                this.style.background = '#fafafa';
+            });
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.borderColor = '#d9d9d9';
+                this.style.background = '#fafafa';
+                const files = e.dataTransfer.files;
+                processFeedbackFiles(files);
+            });
+        }
+
+        // 处理文件选择
+        function handleFeedbackFileSelect(event) {
+            const files = event.target.files;
+            processFeedbackFiles(files);
+            event.target.value = '';
+        }
+
+        // 处理上传的文件
+        function processFeedbackFiles(files) {
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.size > maxSize) {
+                    alert('文件 "' + file.name + '" 超过10MB限制，已跳过');
+                    continue;
+                }
+                if (!allowedTypes.includes(file.type) && !file.name.match(/\.(png|jpg|jpeg|gif|pdf|doc|docx)$/i)) {
+                    alert('文件 "' + file.name + '" 格式不支持，已跳过');
+                    continue;
+                }
+                feedbackAttachments.push(file);
+            }
+            renderFeedbackFileList();
+        }
+
+        // 渲染附件列表
+        function renderFeedbackFileList() {
+            const fileList = document.getElementById('feedbackFileList');
+            if (feedbackAttachments.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+            feedbackAttachments.forEach(function(file, index) {
+                const isImage = file.type && file.type.startsWith('image/');
+                const icon = isImage ? '🖼️' : '📄';
+                const fileSize = file.size < 1024 ? file.size + 'B' : (file.size < 1024 * 1024 ? (file.size / 1024).toFixed(1) + 'KB' : (file.size / (1024 * 1024)).toFixed(1) + 'MB');
+
+                if (isImage) {
+                    const url = URL.createObjectURL(file);
+                    html += '<div style="position: relative; width: 80px; height: 80px; border: 1px solid #e9ecef; border-radius: 6px; overflow: hidden;">';
+                    html += '<img src="' + url + '" style="width: 100%; height: 100%; object-fit: cover;" alt="' + file.name + '">';
+                    html += '<div onclick="removeFeedbackAttachment(' + index + ')" style="position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; line-height: 1;">×</div>';
+                    html += '<div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + file.name + '</div>';
+                    html += '</div>';
+                } else {
+                    html += '<div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #e9ecef; border-radius: 6px; background: #f8f9fa; max-width: 220px;">';
+                    html += '<span style="font-size: 20px;">' + icon + '</span>';
+                    html += '<div style="flex: 1; overflow: hidden;">';
+                    html += '<div style="font-size: 13px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + file.name + '">' + file.name + '</div>';
+                    html += '<div style="font-size: 11px; color: #999;">' + fileSize + '</div>';
+                    html += '</div>';
+                    html += '<span onclick="removeFeedbackAttachment(' + index + ')" style="cursor: pointer; color: #999; font-size: 16px; padding: 2px;">×</span>';
+                    html += '</div>';
+                }
+            });
+            html += '</div>';
+            html += '<div style="font-size: 12px; color: #999; margin-top: 6px;">已选择 ' + feedbackAttachments.length + ' 个附件</div>';
+            fileList.innerHTML = html;
+        }
+
+        // 移除附件
+        function removeFeedbackAttachment(index) {
+            feedbackAttachments.splice(index, 1);
+            renderFeedbackFileList();
         }
 
         // 提交反馈
@@ -2093,6 +2211,11 @@
             const feedbackId = 'FB' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '00' + (Object.keys(feedbackData).length + 1);
             const submitTime = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
 
+            // 收集附件信息
+            const attachments = feedbackAttachments.map(function(file) {
+                return { name: file.name, size: file.size, type: file.type };
+            });
+
             // 添加到反馈数据
             feedbackData[feedbackId] = {
                 id: feedbackId,
@@ -2108,7 +2231,8 @@
                 processor: null,
                 processorAccount: null,
                 processTime: null,
-                processDescription: null
+                processDescription: null,
+                attachments: attachments
             };
 
             // 添加到列表表格
@@ -2129,7 +2253,8 @@
 
             // 关闭弹窗并显示成功提示
             closeFeedbackSubmitModal();
-            alert('反馈提交成功！\n\n反馈ID：' + feedbackId + '\n提交时间：' + submitTime + '\n\n感谢您的反馈，我们会尽快处理。');
+            const attachMsg = attachments.length > 0 ? '\n附件数量：' + attachments.length + '个' : '';
+            alert('反馈提交成功！\n\n反馈ID：' + feedbackId + '\n提交时间：' + submitTime + attachMsg + '\n\n感谢您的反馈，我们会尽快处理。');
         }
 
         // 显示反馈详情弹窗
@@ -2146,6 +2271,26 @@
             document.getElementById('detailFeedbackContent').textContent = feedback.content;
             document.getElementById('detailFeedbackPriority').innerHTML = `<span style="background: ${getPriorityColor(feedback.priority)}; color: ${getPriorityTextColor(feedback.priority)}; padding: 4px 12px; border-radius: 4px; font-size: 12px;">${feedback.priority}</span>`;
             document.getElementById('detailFeedbackModule').textContent = feedback.module;
+
+            // 填充附件信息
+            const attachmentsDiv = document.getElementById('detailAttachments');
+            if (feedback.attachments && feedback.attachments.length > 0) {
+                let attachHtml = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                feedback.attachments.forEach(function(att) {
+                    const isImage = att.type && att.type.startsWith('image/');
+                    const icon = isImage ? '🖼️' : '📄';
+                    const fileSize = att.size < 1024 ? att.size + 'B' : (att.size < 1024 * 1024 ? (att.size / 1024).toFixed(1) + 'KB' : (att.size / (1024 * 1024)).toFixed(1) + 'MB');
+                    attachHtml += '<div style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid #e9ecef; border-radius: 6px; background: #f8f9fa;">';
+                    attachHtml += '<span style="font-size: 18px;">' + icon + '</span>';
+                    attachHtml += '<div><div style="font-size: 13px; color: #333;">' + att.name + '</div>';
+                    attachHtml += '<div style="font-size: 11px; color: #999;">' + fileSize + '</div></div>';
+                    attachHtml += '</div>';
+                });
+                attachHtml += '</div>';
+                attachmentsDiv.innerHTML = attachHtml;
+            } else {
+                attachmentsDiv.textContent = '无附件';
+            }
 
             // 填充提交信息
             document.getElementById('detailSubmitter').textContent = feedback.submitter + '（' + feedback.submitterAccount + ')';
